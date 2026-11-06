@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="color-scheme" content="light" />
+  <title>Calendar Hours · Time Tracking</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <div class="brand"><span class="logo">◷</span><div><strong>Calendar Hours</strong><small>Your project time ledger</small></div></div>
+      <button class="icon-btn" id="refresh" type="button" title="Sync Google Calendar again" aria-label="Sync again">↻</button>
+    </header>
+    <section id="notice" class="notice" role="status" aria-live="polite" hidden></section>
+    <section id="connect-view" class="connect-view" hidden>
+      <div class="welcome-icon">▦</div>
+      <h1>See where your time goes</h1>
+      <p>Connect Google Calendar to calculate project hours automatically. Your events will never be edited or deleted.</p>
+      <button id="connect" class="button primary" type="button">Connect Google Calendar</button>
+      <p class="muted tiny">Set up your own Google OAuth Client ID before connecting. Your data is never uploaded to third-party servers.</p>
+      <button id="demo" type="button" class="button ghost">Try demo data</button>
+    </section>
+    <main id="main-view" hidden>
+      <nav class="tabs" aria-label="Time tracking panel">
+        <button type="button" class="tab active" data-tab="overview">Overview</button>
+        <button type="button" class="tab" data-tab="events">Events</button>
+        <button type="button" class="tab" data-tab="timer">Timer</button>
+        <button type="button" class="tab" data-tab="settings">Settings</button>
+      </nav>
+      <section class="range-bar">
+        <label class="field-label" for="range">Date range</label>
+        <select id="range" class="select">
+          <option value="7">Last 7 days</option>
+          <option value="30" selected>Last 30 days</option>
+          <option value="90">Last 90 days</option>
+          <option value="365">Last 365 days</option>
+          <option value="custom">From a date to today</option>
+        </select>
+        <input id="custom-start" class="date-input" type="date" value="2026-10-01" hidden aria-label="Custom start date" />
+      </section>
+      <section id="overview-page" class="page">
+        <div class="hero">
+          <span class="eyebrow">Total calendar hours for assigned projects</span>
+          <div class="hero-value" id="total-hours">0.0<span>hours</span></div>
+          <p id="summary-meta" class="hero-description">Waiting to sync</p>
+        </div>
+        <div class="metrics">
+          <div class="metric"><span>Tracked with timer</span><strong id="timer-total">0.0h</strong></div>
+          <div class="metric"><span>Unassigned events</span><strong id="unassigned-total">0.0h</strong></div>
+        </div>
+        <div class="section-head"><h2>Hours by project</h2><span id="project-count" class="muted tiny"></span></div>
+        <div class="panel-card" id="project-chart"></div>
+        <div class="section-head"><h2>Recent activity</h2><span class="muted tiny">Up to the last 14 days</span></div>
+        <div class="panel-card"><div id="day-chart" class="day-chart"></div></div>
+        <div class="hint">Calendar hours reflect scheduled time that has elapsed, not confirmed work. Timer hours are counted separately to avoid double counting. Overlapping events may inflate totals.</div>
+      </section>
+      <section id="events-page" class="page" hidden>
+        <div class="section-head"><h2>Categorize events</h2><span id="event-counter" class="muted tiny"></span></div>
+        <p class="muted small space-bottom">Assign a project to each event manually. Changes stay in your browser and do not affect Google Calendar.</p>
+        <label class="field-label" for="event-filter">Filter</label>
+        <select id="event-filter" class="select space-bottom">
+          <option value="all">All events</option>
+          <option value="unassigned">Unassigned only</option>
+          <option value="assigned">Assigned only</option>
+        </select>
+        <div id="event-list" class="event-list"></div>
+      </section>
+      <section id="timer-page" class="page" hidden>
+        <div class="section-head"><h2>Track actual work</h2></div>
+        <div class="timer-card">
+          <label class="field-label" for="timer-project">Project</label>
+          <select id="timer-project" class="select"></select>
+          <div class="stopwatch" id="stopwatch">00:00:00</div>
+          <div class="timer-buttons">
+            <button id="start-timer" class="button primary" type="button">▶ Start timer</button>
+            <button id="stop-timer" class="button danger" type="button" hidden>■ Stop and save</button>
+          </div>
+          <p class="muted tiny">The timer keeps running when you close the panel until you stop it manually. Records are stored locally in Chrome.</p>
+        </div>
+        <div class="section-head"><h2>Recent timer sessions</h2><button id="clear-sessions" class="text-button" type="button">Clear all sessions</button></div>
+        <div id="sessions-list" class="session-list"></div>
+      </section>
+      <section id="settings-page" class="page" hidden>
+        <div class="section-head"><h2>Calendars to sync</h2></div>
+        <div class="panel-card" id="calendar-options"></div>
+        <p class="muted tiny space-bottom">Choose which calendars to read to avoid counting the same event across multiple calendars.</p>
+        <div class="section-head"><h2>Projects and keywords</h2><button id="add-project" class="text-button" type="button">＋ New project</button></div>
+        <div id="project-editor"></div>
+        <p class="muted tiny space-bottom">Separate keywords with commas. Matching is case-insensitive and follows project order. Events are assigned automatically when their titles match a keyword.</p>
+        <div class="section-head"><h2>Export and account</h2></div>
+        <div class="panel-card settings-actions">
+          <button id="export-csv" class="button secondary" type="button">Export CSV (current date range)</button>
+          <button id="leave-demo" class="button secondary" type="button" hidden>Exit demo</button>
+          <button id="disconnect" class="button ghost" type="button">Disconnect</button>
+        </div>
+        <p class="muted tiny">Google Calendar access is read-only. This extension uses no remote database, does not sell your data, and does not access other Google account information.</p>
+      </section>
+    </main>
+    <footer>Calendar Hours · Free personal edition · v0.1</footer>
+  </div>
+  <script type="module" src="panel.mjs"></script>
+</body>
+</html>
